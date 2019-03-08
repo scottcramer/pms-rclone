@@ -1,6 +1,6 @@
-# Official Docker container for Plex Media Server
+# Docker container for Plex Media Server with Rclone mounting
 
-# plexinc/pms-docker
+# scottmcramer/pms-rclone
 
 With our easy-to-install Plex Media Server software and your Plex apps, available on all your favorite phones, tablets, streaming devices, gaming consoles, and smart TVs, you can stream your video, music, and photo collections any time, anywhere, to any device.
 
