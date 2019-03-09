@@ -25,8 +25,8 @@ RUN \
 
 # Fetch and extract rclone
     curl -J -L -o /tmp/rclone.zip https://github.com/ncw/rclone/releases/download/v${RCLONE_VERSION}/rclone-v${RCLONE_VERSION}-linux-amd64.zip && \
-    unzip /tmp/rclone.zip && \
-    mv /tmp/rclone /usr/sbin/rclone && \
+    unzip /tmp/rclone.zip -d /tmp/ && \
+    mv /tmp/rclone-v${RCLONE_VERSION}-linux-amd64/rclone /usr/sbin/rclone && \
     chmod 755 /usr/sbin/rclone && \
     chown root:root /usr/sbin/rclone && \
 
