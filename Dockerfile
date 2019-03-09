@@ -17,8 +17,7 @@ RUN \
       uuid-runtime \
       unrar \
       fuse \
-      libfuse-dev \
-    && \
+      libfuse-dev && \
 
 # Fetch and extract S6 overlay
     curl -J -L -o /tmp/s6-overlay-amd64.tar.gz https://github.com/just-containers/s6-overlay/releases/download/${S6_OVERLAY_VERSION}/s6-overlay-amd64.tar.gz && \
@@ -26,6 +25,7 @@ RUN \
 
 # Fetch and extract rclone
     curl -J -L -o /tmp/rclone.zip https://github.com/ncw/rclone/releases/download/v${RCLONE_VERSION}/rclone-v${RCLONE_VERSION}-linux-amd64.zip && \
+    ls /tmp/ -a && \
     unzip /tmp/rclone.zip && \
     mv /tmp/rclone /usr/sbin/rclone && \
     chmod 755 /usr/sbin/rclone && \
@@ -41,8 +41,7 @@ RUN \
     mkdir -p \
       /config \
       /transcode \
-      /data \
-    && \
+      /data && \
 
 # Cleanup
     apt-get -y autoremove && \
