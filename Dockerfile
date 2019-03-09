@@ -15,7 +15,7 @@ RUN \
       curl \
       xmlstarlet \
       uuid-runtime \
-      unrar \
+      unzip \
       fuse \
       libfuse-dev && \
 
@@ -25,7 +25,6 @@ RUN \
 
 # Fetch and extract rclone
     curl -J -L -o /tmp/rclone.zip https://github.com/ncw/rclone/releases/download/v${RCLONE_VERSION}/rclone-v${RCLONE_VERSION}-linux-amd64.zip && \
-    ls /tmp/ -a && \
     unzip /tmp/rclone.zip && \
     mv /tmp/rclone /usr/sbin/rclone && \
     chmod 755 /usr/sbin/rclone && \
