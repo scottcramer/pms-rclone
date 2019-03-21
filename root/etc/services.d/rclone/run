@@ -2,9 +2,9 @@
 
 echo "Starting Rclone."
 
-if [ ! -d "/rclone" ]; then
-  /bin/mkdir -p "/rclone"
-  chown plex:plex "/rclone"
+if [ ! -d "${RCLONE_TARGET}" ]; then
+  /bin/mkdir -p "${RCLONE_TARGET}"
+  chown plex:plex "${RCLONE_TARGET}"
 fi
 
-exec s6-setuidgid plex /bin/sh -c "/usr/sbin/rclone --config /config/rclone.conf mount ${RCLONE_MOUNT} ${RCLONE_ARGS}"
+exec s6-setuidgid plex /bin/sh -c "/usr/sbin/rclone --config /config/rclone.conf mount ${RCLONE_MOUNT} ${RCLONE_TARGET} ${RCLONE_ARGS}"
