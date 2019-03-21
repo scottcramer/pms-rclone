@@ -7,4 +7,4 @@ if [ ! -d "/rclone" ]; then
   chown plex:plex "/rclone"
 fi
 
-exec s6-setuidgid plex /bin/sh -c "/usr/sbin/rclone --config /config/rclone.conf mount ${RCLONE_MOUNT_ARGUMENTS} ${RCLONE_MOUNT_CONFIG} /rclone"
+exec s6-setuidgid plex /bin/sh -c "/usr/sbin/rclone --config /config/rclone.conf mount ${RCLONE_MOUNT} ${RCLONE_ARGS}"
