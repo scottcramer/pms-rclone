@@ -7,4 +7,10 @@ if [ ! -d "${RCLONE_TARGET}" ]; then
   chown plex:plex "${RCLONE_TARGET}"
 fi
 
-exec s6-setuidgid plex /bin/sh -c "/usr/sbin/rclone --config /config/rclone.conf mount ${RCLONE_MOUNT} ${RCLONE_TARGET} ${RCLONE_ARGS}"
+IFS=' ' # space is set as delimiter
+read -ra MOUNTS <<< ${RCLONE_MOUNT}
+n = 1
+for i in "${MOUNTS[@]}"; do # access each element of array
+    MNT_NAME = "mount${n}"
+    exec s6-setuidgid plex /bin/sh -c "/usr/sbin/rclone --config /config/rclone.conf mount ${i} ${RCLONE_TARGET}/${MNT_NAME} ${RCLONE_ARGS}"
+done
