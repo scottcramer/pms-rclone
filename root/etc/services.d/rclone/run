@@ -9,8 +9,7 @@ fi
 
 IFS=' ' # space is set as delimiter
 read -ra MOUNTS <<< ${RCLONE_MOUNT}
-n = 1
-for i in "${MOUNTS[@]}"; do # access each element of array
-    MNT_NAME = "mount${n}"
-    exec s6-setuidgid plex /bin/sh -c "/usr/sbin/rclone --config /config/rclone.conf mount ${i} ${RCLONE_TARGET}/${MNT_NAME} ${RCLONE_ARGS}"
+
+for i in "${!MOUNTS[@]}"; do # access each element of array
+    exec s6-setuidgid plex /bin/sh -c "/usr/sbin/rclone --config /config/rclone.conf mount ${MOUNTS[i]} ${RCLONE_TARGET}/mount${i} ${RCLONE_ARGS}"
 done
