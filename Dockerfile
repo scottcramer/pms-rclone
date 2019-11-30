@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 ARG S6_OVERLAY_VERSION=v1.17.2.0
 ARG DEBIAN_FRONTEND="noninteractive"
 ENV TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
-ENV RCLONE_VERSION=1.50.2
+ENV RC_VERSION=1.50.2
 
 ENTRYPOINT ["/init"]
 
@@ -24,9 +24,9 @@ RUN \
     tar xzf /tmp/s6-overlay-amd64.tar.gz -C / && \
 
 # Fetch and extract rclone
-    curl -J -L -o /tmp/rclone.zip https://github.com/ncw/rclone/releases/download/v${RCLONE_VERSION}/rclone-v${RCLONE_VERSION}-linux-amd64.zip && \
+    curl -J -L -o /tmp/rclone.zip https://github.com/ncw/rclone/releases/download/v${RC_VERSION}/rclone-v${RC_VERSION}-linux-amd64.zip && \
     unzip /tmp/rclone.zip -d /tmp/ && \
-    mv /tmp/rclone-v${RCLONE_VERSION}-linux-amd64/rclone /usr/sbin/rclone && \
+    mv /tmp/rclone-v${RC_VERSION}-linux-amd64/rclone /usr/sbin/rclone && \
     chmod 755 /usr/sbin/rclone && \
     chown root:root /usr/sbin/rclone && \
 
