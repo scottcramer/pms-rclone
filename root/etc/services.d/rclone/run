@@ -11,5 +11,9 @@ IFS=' ' # space is set as delimiter
 read -ra MOUNTS <<< ${RCLONE_MOUNT}
 
 for i in "${!MOUNTS[@]}"; do # access each element of array
+    if [ ! -d "${RCLONE_TARGET}/mount${i}" ]; then
+      /bin/mkdir -p "${RCLONE_TARGET}/mount${i}"
+      chown plex:plex "${RCLONE_TARGET}/mount${i}"
+    fi
     exec s6-setuidgid plex /bin/sh -c "/usr/sbin/rclone --config /config/rclone.conf mount ${MOUNTS[i]} ${RCLONE_TARGET}/mount${i} ${RCLONE_ARGS}"
 done
