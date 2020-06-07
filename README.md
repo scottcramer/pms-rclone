@@ -86,6 +86,18 @@ Note: In this configuration, you must do some additional configuration:
 - If you wish your Plex Media Server to be accessible outside of your home network, you must manually setup port forwarding on your router to forward to the `ADVERTISE_IP` specified above.  By default you can forward port 32400, but if you choose to use a different external port, be sure you configure this in Plex Media Server's `Remote Access` settings.  With this type of docker networking, the Plex Media Server is essentially behind two routers and it cannot automatically setup port forwarding on its own.
 - (Plex Pass only) After the server has been set up, you should configure the `LAN Networks` preference to contain the network of your LAN.  This instructs the Plex Media Server to treat these IP addresses as part of your LAN when applying bandwidth controls.  The syntax is the same as the `ALLOWED_NETWORKS` below.  For example `192.168.1.0/24,172.16.0.0/16` will allow access to the entire `192.168.1.x` range and the `172.16.x.x` range.
 
+### Using `docker-compose` on ARM devices
+
+The provided `docker-compose` templates use the `plexinc/pms-docker` image which is the amd64 build and won't work on ARM devices.
+
+To use `docker-compose` with ARM devices, you must first build one of the ARM images locally.
+
+```sh
+docker build -t plexinc/pms-docker:latest -f Dockerfile.armv7 # or arm64
+```
+
+Then you can `docker-compose up`.
+
 ## Parameters
 
 - `-p 32400:32400/tcp` Forwards port 32400 from the host to the container.  This is the primary port that Plex uses for communication and is required for Plex Media Server to operate.
@@ -100,7 +112,7 @@ The following are the recommended parameters.  Each of the following parameters 
 - **HOSTNAME** Sets the hostname inside the docker container. For example `-h PlexServer` will set the servername to `PlexServer`.  Not needed in Host Networking.
 - **TZ** Set the timezone inside the container.  For example: `Europe/London`.  The complete list can be found here: [https://en.wikipedia.org/wiki/List_of_tz_database_time_zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
 - **PLEX_CLAIM** The claim token for the server to obtain a real server token.  If not provided, server will not be automatically logged in.  If server is already logged in, this parameter is ignored.  You can obtain a claim token to login your server to your plex account by visiting [https://www.plex.tv/claim](https://www.plex.tv/claim)
-- **ADVERTISE_IP** This variable defines the additional IPs on which the server may be be found.  For example: `http://10.1.1.23:32400`.  This adds to the list where the server advertises that it can be found.  This is only needed in Bridge Networking.
+- **ADVERTISE_IP** This variable defines the additional IPs on which the server may be found.  For example: `http://10.1.1.23:32400`.  This adds to the list where the server advertises that it can be found.  This is only needed in Bridge Networking.
 
 These parameters are usually not required but some special setups may benefit from their use.  As in the previous section, each is treated as first-run parameters only:
 
@@ -159,6 +171,43 @@ plex    | s6-supervise (child): fatal: unable to exec run: Permission denied
 plex    | s6-supervise avahi: warning: unable to spawn ./run - waiting 10 seconds
 ```
 As a workaround you can add `- /run` to volumes in your docker-compose.yml or `-v /run` to the docker create command.
+
+## Intel Quick Sync Hardware Transcoding Support
+If your Docker host has access to a supported CPU with the Intel Quick Sync feature set and you are a current Plex Pass subscriber, you can enable hardware transcoding within your Plex Docker container.
+
+A list of current and previous Intel CPU's supporting Quick Sync is available on the Intel [website](https://ark.intel.com/content/www/us/en/ark/search/featurefilter.html?productType=873&0_QuickSyncVideo=True).
+
+Hardware transcoding is a Plex Pass feature that can be added to your Docker container by bind mounting the relevant kernel device to the container. To confirm your host kernel supports the Intel Quick Sync feature, the following command can be executed on the host:
+
+`lspci -v -s $(lspci | grep VGA | cut -d" " -f 1)`
+
+which should output `Kernel driver in use: i915` if Quick Sync is available. To pass the kernel device through to the container, add the device parameter like so:
+
+```
+docker run \
+-d \
+--name plex \
+--network=host \
+-e TZ="<timezone>" \
+-e PLEX_CLAIM="<claimToken>" \
+-v <path/to/plex/database>:/config \
+-v <path/to/transcode/temp>:/transcode \
+-v <path/to/media>:/data \
+--device=/dev/dri:/dev/dri \
+plexinc/pms-docker
+```
+
+In the example above, the `--device=/dev/dri:/dev/dri` was added to the `docker run` command to pass through the kernel device. Once the Plex Media Server container is running, the following steps will turn on the Hardware Transcoding option:
+
+1. Open the Plex Web app.
+2. Navigate to Settings > Server > Transcoder to access the server settings.
+3. Turn on Show Advanced in the upper-right corner to expose advanced settings.
+4. Turn on Use hardware acceleration when available.
+5. Click Save Changes at the bottom.
+
+**NOTE:** Intel Quick Sync support also requires newer _64-bit versions of the Ubuntu or Fedora Linux operating system_ to make use of this feature. If your Docker host also has a dedicated graphics card, the video encoding acceleration of Intel Quick Sync Video may become unavailable when the GPU is in use. _If your computer has an NVIDIA GPU_, please install the latest Latest NVIDIA drivers for Linux to make sure that Plex can use your NVIDIA graphics card for video encoding (only) when Intel Quick Sync Video becomes unavailable._
+
+Your mileage may vary when enabling hardware transcoding as newer generations of Intel CPU's provide transcoding of higher resolution video and newer codecs. There is a useful Wikipedia page [here](https://en.wikipedia.org/wiki/Intel_Quick_Sync_Video#Hardware_decoding_and_encoding) which provides a handy matrix for each CPU generation's support of on-chip video decoding.
 
 ## Windows (Not Recommended)
 
