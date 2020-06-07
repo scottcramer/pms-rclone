@@ -6,7 +6,7 @@ ARG PLEX_BUILD=linux-x86_64
 ARG PLEX_DISTRO=debian
 ARG DEBIAN_FRONTEND="noninteractive"
 ENV TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
-ENV RCLONE_VERSION="1.46"
+ENV RCLONE_VERSION="1.52.0"
 
 ENTRYPOINT ["/init"]
 
@@ -67,4 +67,4 @@ RUN \
 # Save version and install
     /installBinary.sh
 
-HEALTHCHECK --interval=5s --timeout=2s --retries=20 CMD /healthcheck.sh || exit 1
+HEALTHCHECK --interval=10s --timeout=2s --retries=20 CMD /healthcheck.sh || exit 1
